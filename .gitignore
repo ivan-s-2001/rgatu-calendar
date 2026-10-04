@@ -1,0 +1,10 @@
+build/
+.gradle/
+local.properties
+*.jks
+*.keystore
+*.apk.idsig
+signing/
+node_modules/
+__pycache__/
+*.tmp

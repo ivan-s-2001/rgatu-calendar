@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "esbuild": "0.25.10",
+    "fflate": "0.8.2"
+  },
+  "name": "rgatu-calendar-backend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/worker.js --bundle --format=esm --target=es2022 --minify --outfile=dist/worker.js",
+    "test": "node --test test/*.test.js"
+  }
+}

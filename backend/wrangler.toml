@@ -1,0 +1,18 @@
+name = "rgatu-calendar-api"
+main = "dist/worker.js"
+compatibility_date = "2025-09-01"
+workers_dev = true
+
+[triggers]
+crons = ["0 * * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "rgatu-calendar"
+database_id = "658c3a4e-1c9e-43f7-841b-6501bed0b06d"
+
+[vars]
+SELF_URL = "https://rgatu-calendar-api.ivan-s-2001.workers.dev"
+PWA_ORIGIN = "https://ivan-s-2001.github.io"
+
+VAPID_PUBLIC = "BIkGjAxnlZKmVJL367r_f_ptiLFqAzhUYmxos4PctywIbczl74vw-edPBJ4_mpQAUv-hI9Vfo0xpU1i_d8ALF30"
