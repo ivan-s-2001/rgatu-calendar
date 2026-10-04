@@ -1,5 +1,5 @@
 'use strict';
-const UI = 'rgatu-ui-bc111403774fbdee', DATA = 'rgatu-database-v1';
+const UI = 'rgatu-ui-4e159ae36771d798', DATA = 'rgatu-database-v1';
 const API = 'https://rgatu-calendar-api.ivan-s-2001.workers.dev';
 const FILES = ['./', 'index.html', 'app.css', 'app.js', 'pwa.js', 'manifest.webmanifest', 'app-icon.svg', 'app-icon-192.png', 'app-icon-512.png'];
 const ICONS = ['calendar','calendar-month','list','search','chevron-down','chevron-left','chevron-right','star','x','moon','sun','settings','download','file-spreadsheet','school','external-link','share','map-pin','user','check','refresh','info-circle','arrow-right','users'];

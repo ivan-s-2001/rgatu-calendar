@@ -20,8 +20,8 @@ import org.json.*;
 public final class MainActivity extends Activity {
     private static final String ORIGIN = "appassets.androidplatform.net";
     private static final String PAGE = "https://ivan-s-2001.github.io/rgatu-calendar/";
-    private static final int VERSION_CODE = 1;
-    private static final String VERSION_NAME = "1.0.0";
+    private static final int VERSION_CODE = 2;
+    private static final String VERSION_NAME = "1.0.1";
     private WebView web;
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
     private boolean alive = true;

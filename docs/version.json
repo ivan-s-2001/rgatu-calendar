@@ -1,9 +1,9 @@
 {
-  "versionCode": 1,
-  "versionName": "1.0.0",
-  "apk": "downloads/RgatuCalendar-1.0.0.apk",
-  "bytes": 2131591,
-  "sha256": "3f6eee372ef18ff8150be85b1af98d7bf5693f089c7bc99444a5c61c9eef8e34",
+  "versionCode": 2,
+  "versionName": "1.0.1",
+  "apk": "downloads/RgatuCalendar-1.0.1.apk",
+  "bytes": 2131671,
+  "sha256": "1c65836aca24b1064844652c0091eee653e7c28279f17931ea08a3f1009865f0",
   "minAndroid": "8.0",
   "notes": "Расписание ФЗО, поиск, избранное, офлайн база, ЛК1 и ЛК2."
 }
