@@ -1,3 +1,6 @@
+import './design-system/tokens.css';
+import './design-system/foundation.css';
+import './design-system/components.css';
 import './app.css';
 import { api } from './api.js';
 
