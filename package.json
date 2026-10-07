@@ -1,0 +1,8 @@
+{
+  "name": "rgatu-student-hub",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "test": "node scripts/test_portal.cjs"
+  }
+}
