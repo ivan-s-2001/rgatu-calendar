@@ -1,3 +1,4 @@
+import { api, ApiError } from './api.js';
 import { getProfile, saveStudentProfile, esc } from './core/state.js';
 import { getPage, go } from './core/router.js';
 import { icon } from './ui/icons.js';
@@ -9,6 +10,7 @@ const surface = window.rgatuConfig?.surface || 'student';
 const meta = SURFACE_META[surface] || SURFACE_META.student;
 
 let pageMap = {};
+let authState = null;
 let toastTimer;
 
 function toast(message) {
@@ -18,19 +20,84 @@ function toast(message) {
   toastTimer = setTimeout(() => toastNode.classList.remove('show'), 2600);
 }
 
+function loginGate(error = '') {
+  return `
+    <main class="auth-gate">
+      <section class="auth-brand">
+        <img src="./icon.svg" alt="">
+        <span class="eyebrow">${esc(meta.eyebrow)}</span>
+        <h1>РГАТУ · ${esc(meta.title)}</h1>
+        <p>Войдите с университетской учётной записью. Сейчас используется временный password-provider; позже эта форма будет заменена SSO.</p>
+      </section>
+      <section class="auth-card">
+        <form class="auth-form" id="auth-form">
+          <label>
+            <span>Логин</span>
+            <input name="login" autocomplete="username" required autofocus>
+          </label>
+          <label>
+            <span>Пароль</span>
+            <input name="password" type="password" autocomplete="current-password" required>
+          </label>
+          <div class="auth-error ${error ? 'is-visible' : ''}" id="auth-error">${esc(error)}</div>
+          <button class="auth-submit" type="submit">Войти</button>
+        </form>
+        <p class="auth-note">Сессионный токен хранится только в HttpOnly cookie на api.rsatu.ru. Пароль не сохраняется во frontend.</p>
+      </section>
+    </main>`;
+}
+
+function serviceUnavailable(message) {
+  return `
+    <main class="access-denied">
+      <section class="rs-card">
+        <span class="eyebrow">api.rsatu.ru</span>
+        <h1>Сервис временно недоступен</h1>
+        <p>${esc(message || 'Не удалось связаться с сервером авторизации.')}</p>
+        <button class="rs-button rs-button--primary" data-retry-auth style="margin-top:18px">Повторить</button>
+      </section>
+    </main>`;
+}
+
+function accessDenied() {
+  const surfaces = authState?.user?.access?.surfaces || [];
+  const available = surfaces
+    .map((id) => SURFACE_META[id])
+    .filter(Boolean)
+    .map((item) => `<a class="rs-button rs-button--secondary" href="https://${item.domain}">${esc(item.title)}</a>`)
+    .join('');
+
+  return `
+    <main class="access-denied">
+      <section class="rs-card">
+        <span class="eyebrow">доступ ограничен</span>
+        <h1>Нет доступа к ${esc(meta.title.toLowerCase())}</h1>
+        <p>Учётная запись активна, но backend не выдал право на поверхность <b>${esc(surface)}</b>. Доступ определяется ролями и scope в Yii3.</p>
+        <div class="rs-toolbar" style="margin-top:18px">
+          ${available || '<span class="rs-status">нет доступных интерфейсов</span>'}
+          <button class="rs-button rs-button--secondary" data-logout>Выйти</button>
+        </div>
+      </section>
+    </main>`;
+}
+
 function headerContext() {
+  const user = authState?.user;
+  const fullName = user?.person?.fullName || user?.login || 'Пользователь';
+
   if (surface === 'student') {
     const profile = getProfile();
-    return profile.group
-      ? `<b>${esc(profile.group)}</b><span>${esc(profile.course)} курс</span>`
-      : '<span>Профиль не настроен</span>';
+    const secondLine = profile.group
+      ? `${esc(profile.group)} · ${esc(profile.course)} курс`
+      : 'студент';
+
+    return `<div class="topbar-user"><b>${esc(fullName)}</b><span>${secondLine}</span></div>`;
   }
 
-  if (surface === 'teacher') {
-    return '<b>Преподаватель</b><span>нагрузка из backend</span>';
-  }
+  const assignments = user?.access?.assignments || [];
+  const roleName = assignments[0]?.role?.name || meta.title;
 
-  return '<b>Администрация</b><span>область доступа из RBAC</span>';
+  return `<div class="topbar-user"><b>${esc(fullName)}</b><span>${esc(roleName)}</span></div>`;
 }
 
 function shell(page, content) {
@@ -48,7 +115,8 @@ function shell(page, content) {
           <div><span>${meta.eyebrow}</span><strong>РГАТУ · ${meta.title}</strong></div>
         </div>
         <div class="topbar-actions">
-          <div class="student-chip">${headerContext()}</div>
+          ${headerContext()}
+          <button class="logout-button" data-logout title="Выйти">Выйти</button>
         </div>
       </header>
       <main class="page">${content}</main>
@@ -88,36 +156,114 @@ async function loadPages() {
   };
 }
 
-function render() {
+function renderAuthorized() {
+  if (!authState?.user?.access?.surfaces?.includes(surface)) {
+    root.innerHTML = accessDenied();
+    return;
+  }
+
   const requestedPage = getPage('home');
   const page = pageMap[requestedPage] ? requestedPage : 'home';
   root.innerHTML = shell(page, pageMap[page]());
 }
 
-root.addEventListener('click', (event) => {
+async function bootstrapAuth() {
+  root.innerHTML = '<main class="boot"><div class="mark">Р</div><strong>Проверяем вход</strong><span>api.rsatu.ru</span></main>';
+
+  try {
+    authState = await api.me();
+    renderAuthorized();
+  } catch (error) {
+    authState = null;
+
+    if (error instanceof ApiError && error.status === 401) {
+      root.innerHTML = loginGate();
+      return;
+    }
+
+    root.innerHTML = serviceUnavailable(error?.message);
+  }
+}
+
+root.addEventListener('click', async (event) => {
   const goButton = event.target.closest('[data-go]');
   if (goButton) {
     go(String(goButton.dataset.go || 'home'));
+    return;
+  }
+
+  if (event.target.closest('[data-retry-auth]')) {
+    await bootstrapAuth();
+    return;
+  }
+
+  if (event.target.closest('[data-logout]')) {
+    try {
+      await api.logout();
+    } catch {
+      api.clearCsrf();
+    }
+
+    authState = null;
+    root.innerHTML = loginGate();
   }
 });
 
-root.addEventListener('submit', (event) => {
-  if (surface !== 'student' || event.target.id !== 'profile-form') return;
-  event.preventDefault();
-  saveStudentProfile(new FormData(event.target));
-  toast('Профиль сохранён');
-  render();
+root.addEventListener('submit', async (event) => {
+  if (event.target.id === 'auth-form') {
+    event.preventDefault();
+
+    const form = event.target;
+    const button = form.querySelector('button[type="submit"]');
+    const errorNode = form.querySelector('#auth-error');
+    const data = new FormData(form);
+
+    button.disabled = true;
+    errorNode.classList.remove('is-visible');
+
+    try {
+      authState = await api.login(
+        String(data.get('login') || '').trim(),
+        String(data.get('password') || ''),
+      );
+
+      if (!authState?.user?.access?.surfaces?.includes(surface)) {
+        root.innerHTML = accessDenied();
+        return;
+      }
+
+      renderAuthorized();
+    } catch (error) {
+      errorNode.textContent = error instanceof ApiError && error.status === 401
+        ? 'Неверный логин или пароль.'
+        : (error?.message || 'Не удалось выполнить вход.');
+      errorNode.classList.add('is-visible');
+    } finally {
+      button.disabled = false;
+    }
+
+    return;
+  }
+
+  if (surface === 'student' && event.target.id === 'profile-form') {
+    event.preventDefault();
+    saveStudentProfile(new FormData(event.target));
+    toast('Профиль сохранён');
+    renderAuthorized();
+  }
 });
 
-window.addEventListener('hashchange', render);
+window.addEventListener('hashchange', () => {
+  if (authState) renderAuthorized();
+});
 
 loadPages()
   .then((pages) => {
     pageMap = pages;
-    render();
+    return bootstrapAuth();
   })
-  .catch(() => {
-    root.innerHTML = '<main class="boot"><strong>Не удалось загрузить интерфейс.</strong><span>Обновите страницу.</span></main>';
+  .catch((error) => {
+    root.innerHTML = serviceUnavailable(error?.message);
   });
 
 if ('serviceWorker' in navigator) {

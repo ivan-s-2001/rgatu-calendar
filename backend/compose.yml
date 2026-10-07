@@ -10,7 +10,7 @@ services:
       - "3306:3306"
     volumes:
       - rgatu_mariadb:/var/lib/mysql
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+      - ./database:/docker-entrypoint-initdb.d:ro
 
 volumes:
   rgatu_mariadb:

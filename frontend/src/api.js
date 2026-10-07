@@ -1,32 +1,80 @@
 const baseUrl = String(import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 
-async function get(path, options = {}) {
+let csrfToken = '';
+
+export class ApiError extends Error {
+  constructor(message, status, payload = null) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.payload = payload;
+  }
+}
+
+async function request(method, path, body = undefined, options = {}) {
   if (!baseUrl) {
-    throw new Error('VITE_API_BASE_URL is not configured.');
+    throw new ApiError('VITE_API_BASE_URL is not configured.', 0);
   }
 
+  const headers = {
+    Accept: 'application/json',
+    ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+    ...(csrfToken && !['GET', 'HEAD', 'OPTIONS'].includes(method)
+      ? { 'X-CSRF-Token': csrfToken }
+      : {}),
+    ...(options.headers || {}),
+  };
+
   const response = await fetch(`${baseUrl}${path}`, {
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-      ...(options.headers || {}),
-    },
+    method,
+    credentials: 'include',
+    headers,
+    body: body === undefined ? undefined : JSON.stringify(body),
     signal: options.signal,
   });
 
   const payload = await response.json().catch(() => null);
 
   if (!response.ok) {
-    const message = payload?.error_message || `API request failed: ${response.status}`;
-    throw new Error(message);
+    throw new ApiError(
+      payload?.error_message || `API request failed: ${response.status}`,
+      response.status,
+      payload,
+    );
   }
 
-  return payload?.data ?? payload;
+  const data = payload?.data ?? payload;
+
+  if (data?.csrfToken) {
+    csrfToken = data.csrfToken;
+  }
+
+  return data;
 }
 
 export const api = Object.freeze({
   baseUrl,
-  meta: (options) => get('/api/v1/meta', options),
-  health: (options) => get('/api/v1/health', options),
-  groups: (options) => get('/api/v1/groups', options),
+
+  meta: (options) => request('GET', '/api/v1/meta', undefined, options),
+  health: (options) => request('GET', '/api/v1/health', undefined, options),
+  groups: (options) => request('GET', '/api/v1/groups', undefined, options),
+
+  login: (login, password, options) => request(
+    'POST',
+    '/api/v1/auth/login',
+    { login, password },
+    options,
+  ),
+
+  me: (options) => request('GET', '/api/v1/me', undefined, options),
+
+  logout: async (options) => {
+    const result = await request('POST', '/api/v1/auth/logout', {}, options);
+    csrfToken = '';
+    return result;
+  },
+
+  clearCsrf: () => {
+    csrfToken = '';
+  },
 });

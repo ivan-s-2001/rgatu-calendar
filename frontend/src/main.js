@@ -4,6 +4,7 @@ import './design-system/components.css';
 import './app.css';
 import './surface-shell.css';
 import './navigation.css';
+import './auth.css';
 import { api } from './api.js';
 import { resolveSurface, SURFACE_META } from './core/surface.js';
 
