@@ -23,13 +23,6 @@ export const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => 
   "'": '&#39;',
 }[char]));
 
-export const getActorRole = () => {
-  const role = safeRead('hub.actorRole');
-  return ['student', 'teacher', 'admin'].includes(role) ? role : '';
-};
-
-export const setActorRole = (role) => safeWrite('hub.actorRole', role);
-
 export const getProfile = () => ({
   name: safeRead('hub.name'),
   group: safeRead('rgatu.group'),

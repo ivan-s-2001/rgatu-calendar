@@ -40,17 +40,17 @@ export function studentHome() {
     <section class="section">
       <div class="section-head"><span class="eyebrow">сегодня</span><h2>Главное</h2></div>
       <div class="dashboard-grid">
-        <button class="feature primary-feature" data-go="student/schedule">
+        <button class="feature primary-feature" data-go="schedule">
           <span class="feature-icon">${icon('calendar')}</span>
           <span><b>Расписание</b><small>${profile.group ? `Группа ${esc(profile.group)}` : 'Выбрать группу'}</small></span>
           ${icon('arrow')}
         </button>
-        <button class="feature" data-go="student/study">
+        <button class="feature" data-go="study">
           <span class="feature-icon">${icon('book')}</span>
           <span><b>Учёба</b><small>ДКР, задания, сессия, задолженности</small></span>
           ${icon('arrow')}
         </button>
-        <button class="feature" data-go="student/services">
+        <button class="feature" data-go="services">
           <span class="feature-icon">${icon('grid')}</span>
           <span><b>Сервисы</b><small>ЛК и официальные ресурсы</small></span>
           ${icon('arrow')}

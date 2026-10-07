@@ -1,22 +1,12 @@
-const LEGACY = {
-  home: 'student/home',
-  schedule: 'student/schedule',
-  services: 'student/services',
-  profile: 'student/profile',
-};
-
-export function getRoute(role = 'student') {
+export function getPage(defaultPage = 'home') {
   const raw = location.hash.replace(/^#\/?/, '');
-  const migrated = LEGACY[raw] || raw;
-  if (!migrated) return { role, page: 'home' };
+  if (!raw) return defaultPage;
 
-  const [routeRole, page = 'home'] = migrated.split('/');
-  if (!['student', 'teacher', 'admin'].includes(routeRole)) {
-    return { role, page: 'home' };
-  }
-  return { role: routeRole, page };
+  // Backward compatibility with the former #student/home style routes.
+  const parts = raw.split('/').filter(Boolean);
+  return parts.at(-1) || defaultPage;
 }
 
-export function go(role, page = 'home') {
-  location.hash = `${role}/${page}`;
+export function go(page = 'home') {
+  location.hash = page;
 }

@@ -1,0 +1,14 @@
+{
+  "id": "./",
+  "name": "РГАТУ · Студент",
+  "short_name": "РГАТУ",
+  "description": "Личное пространство студента РГАТУ",
+  "lang": "ru",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#eef1f4",
+  "theme_color": "#1f274b",
+  "categories": ["education", "productivity"],
+  "icons": [{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"}]
+}

@@ -1,4 +1,4 @@
-name: Pages
+name: Student Pages
 on:
   push:
     branches: [main]
@@ -10,7 +10,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: student-pages
   cancel-in-progress: true
 
 jobs:
@@ -27,12 +27,12 @@ jobs:
       - name: Install frontend dependencies
         working-directory: frontend
         run: npm install
-      - name: Build Vite frontend
+      - name: Build student frontend
         working-directory: frontend
-        run: npm run build
+        run: npm run build:student
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: frontend/dist
+          path: frontend/dist/student
       - id: deployment
         uses: actions/deploy-pages@v4

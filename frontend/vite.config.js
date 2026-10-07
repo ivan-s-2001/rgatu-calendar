@@ -1,9 +1,15 @@
 import { defineConfig } from 'vite';
 
-export default defineConfig({
-  base: './',
-  build: {
-    outDir: 'dist',
-    emptyOutDir: true,
-  },
+const SURFACES = new Set(['student', 'teacher', 'admin']);
+
+export default defineConfig(({ mode }) => {
+  const surface = SURFACES.has(mode) ? mode : 'student';
+
+  return {
+    base: './',
+    build: {
+      outDir: `dist/${surface}`,
+      emptyOutDir: true,
+    },
+  };
 });

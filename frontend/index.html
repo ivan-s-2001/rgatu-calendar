@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#1f274b">
-  <meta name="description" content="Неофициальное единое приложение студента РГАТУ">
+  <meta name="description" content="РГАТУ · %VITE_APP_TITLE%">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>РГАТУ · Студент</title>
-  <link rel="manifest" href="./manifest.webmanifest">
+  <title>РГАТУ · %VITE_APP_TITLE%</title>
+  <link rel="manifest" href="./manifest-%VITE_APP_SURFACE%.webmanifest">
   <link rel="icon" href="./icon.svg" type="image/svg+xml">
   <script type="module" src="/src/main.js"></script>
 </head>
@@ -16,8 +16,8 @@
   <div id="app">
     <main class="boot">
       <div class="mark">Р</div>
-      <strong>РГАТУ · Студент</strong>
-      <span>неофициальное приложение</span>
+      <strong>РГАТУ · %VITE_APP_TITLE%</strong>
+      <span>единая университетская система</span>
     </main>
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>

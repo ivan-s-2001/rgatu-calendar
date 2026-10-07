@@ -1,12 +1,20 @@
 {
-  "name": "rgatu-student-frontend",
+  "name": "rgatu-university-frontends",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "vite --mode student",
+    "dev:student": "vite --mode student",
+    "dev:teacher": "vite --mode teacher",
+    "dev:admin": "vite --mode admin",
+    "build": "npm run build:student && npm run build:teacher && npm run build:admin",
+    "build:student": "vite build --mode student",
+    "build:teacher": "vite build --mode teacher",
+    "build:admin": "vite build --mode admin",
+    "preview:student": "vite preview --outDir dist/student",
+    "preview:teacher": "vite preview --outDir dist/teacher",
+    "preview:admin": "vite preview --outDir dist/admin"
   },
   "devDependencies": {
     "vite": "8.3.3"
