@@ -1,21 +1,227 @@
-(()=>{'use strict';
-const root=document.getElementById('app'),toastNode=document.getElementById('toast');
-const SERVICES={lk1:{title:'ЛК1',subtitle:'Старый личный кабинет ФЗО',url:'https://old.rsatu.ru/fzo/kod.php',tag:'Личный кабинет'},lk2:{title:'ЛК2',subtitle:'Новый личный кабинет РГАТУ',url:'https://lk.rsatu.ru/user/sign-in/login?_referrer=%2Fsite%2Findex',tag:'Личный кабинет'},classes:{title:'Расписание занятий',subtitle:'Официальная страница университета',url:'https://www.rsatu.ru/students/raspisanie-zanyatiy/',tag:'РГАТУ'},sessions:{title:'Расписание сессий',subtitle:'Установочные и экзаменационные сессии',url:'https://www.rsatu.ru/students/raspisanie-sessii/',tag:'РГАТУ'},fzo:{title:'Заочное обучение',subtitle:'Информация факультета ФЗО',url:'https://www.rsatu.ru/zaochnoe/',tag:'РГАТУ'},site:{title:'Сайт РГАТУ',subtitle:'Официальный сайт университета',url:'https://www.rsatu.ru/',tag:'РГАТУ'}};
-const read=(k,f='')=>{try{return localStorage.getItem(k)??f}catch{return f}},write=(k,v)=>{try{localStorage.setItem(k,v);return true}catch{return false}},esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const profile=()=>({name:read('hub.name'),group:read('rgatu.group'),course:read('hub.course','1'),form:read('hub.form','unknown'),faculty:read('hub.faculty')});
-const route=()=>['home','schedule','services','profile'].includes(location.hash.slice(1))?location.hash.slice(1):'home';
-const formLabel=v=>({full:'очная',part:'очно-заочная',distance:'заочная',unknown:'форма не выбрана'})[v]||v;
-let tt;function toast(m){toastNode.textContent=m;toastNode.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>toastNode.classList.remove('show'),3000)}
-function ico(n){const p={home:'<path d="M8 1.5 1.5 7v7.5h4V10h5v4.5h4V7z"/>',calendar:'<path d="M2 2.5h12v12H2z"/><path d="M2 6h12M5 1v3M11 1v3"/>',grid:'<path d="M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z"/>',user:'<circle cx="8" cy="5" r="3"/><path d="M2.5 15c.4-3.3 2.2-5 5.5-5s5.1 1.7 5.5 5"/>',arrow:'<path d="M3 8h10M9 4l4 4-4 4"/>',external:'<path d="M9 2h5v5M14 2 7.5 8.5"/><path d="M12 9v5H2V4h5"/>'};return '<svg class="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(p[n]||p.grid)+'</svg>'}
-function chrome(page,content){const p=profile();return '<div class="shell"><header class="topbar"><div class="brand"><img src="./icon.svg" alt=""><div><span>неофициальное</span><strong>РГАТУ · Студент</strong></div></div><div class="student-chip">'+(p.group?'<b>'+esc(p.group)+'</b><span>'+esc(p.course)+' курс</span>':'<span>Настроить профиль</span>')+'</div></header><main class="page">'+content+'</main><nav class="nav" aria-label="Главное меню">'+[['home','home','Главная'],['schedule','calendar','Расписание'],['services','grid','Сервисы'],['profile','user','Профиль']].map(([id,g,l])=>'<a href="#'+id+'"'+(page===id?' aria-current="page"':'')+'>'+ico(g)+'<span>'+l+'</span></a>').join('')+'</nav></div>'}
-function hero(){const p=profile(),ready=p.group&&p.form!=='unknown';return '<section class="hero"><div><span class="eyebrow">единое пространство студента</span><h1>'+(p.name?'Привет, '+esc(p.name):'Всё нужное для учёбы — в одном месте')+'</h1><p>Расписание, личные кабинеты и сервисы РГАТУ без поиска по разным страницам.</p></div><div class="hero-status"><span class="status-dot '+(ready?'ok':'')+'"></span><div><strong>'+(ready?'Профиль настроен':'Заполни профиль')+'</strong><span>'+(ready?esc(p.group)+' · '+esc(formLabel(p.form)):'Группа и форма обучения нужны для персонализации')+'</span></div></div></section>'}
-function home(){const p=profile();return chrome('home',hero()+'<section class="section"><div class="section-head"><div><span class="eyebrow">сегодня</span><h2>Быстрый старт</h2></div></div><div class="feature-grid"><button class="feature primary-feature" data-go="schedule"><span class="feature-icon">'+ico('calendar')+'</span><span><b>Расписание</b><small>'+(p.group?'Открыть расписание '+esc(p.group):'Выбрать группу и открыть расписание')+'</small></span>'+ico('arrow')+'</button><a class="feature" href="'+SERVICES.lk2.url+'" target="_blank" rel="noopener"><span class="feature-icon">'+ico('user')+'</span><span><b>ЛК2</b><small>Новый личный кабинет</small></span>'+ico('external')+'</a><a class="feature" href="'+SERVICES.lk1.url+'" target="_blank" rel="noopener"><span class="feature-icon">'+ico('user')+'</span><span><b>ЛК1</b><small>Старый кабинет ФЗО</small></span>'+ico('external')+'</a><button class="feature" data-go="services"><span class="feature-icon">'+ico('grid')+'</span><span><b>Все сервисы</b><small>Сессии, сайт, факультеты и кабинеты</small></span>'+ico('arrow')+'</button></div></section><section class="section"><div class="section-head"><div><span class="eyebrow">развиваем дальше</span><h2>Одна система вместо россыпи сайтов</h2></div></div><div class="roadmap"><div><b>Расписание</b><span>Уже внутри приложения</span></div><div><b>ЛК1 + ЛК2</b><span>Единая точка входа сейчас, адаптеры позже</span></div><div><b>Сессия и ДКР</b><span>Следующий модуль данных</span></div><div><b>Задолженности</b><span>Планируется единый статус и сроки</span></div></div></section>')}
-function schedule(){const p=profile(),notice=p.form!=='distance'&&p.form!=='unknown'?'<div class="coverage"><strong>Приложение универсальное.</strong><span>Встроенный набор пока содержит ФЗО. Очное расписание подключается вторым адаптером без изменения экрана.</span><a href="'+SERVICES.classes.url+'" target="_blank" rel="noopener">Официальное расписание '+ico('external')+'</a></div>':'';return chrome('schedule','<div class="screen-head"><div><span class="eyebrow">модуль</span><h1>Расписание</h1><p>'+(p.group?'Группа '+esc(p.group):'Сначала выбери группу в профиле')+'</p></div></div>'+notice+'<section class="schedule-frame-wrap"><iframe class="schedule-frame" title="Расписание РГАТУ" src="./modules/schedule/index.html?embed=1#day" loading="eager"></iframe></section>')}
-function serviceCard(i){return '<a class="service-card" href="'+i.url+'" target="_blank" rel="noopener"><div><span>'+esc(i.tag)+'</span><h3>'+esc(i.title)+'</h3><p>'+esc(i.subtitle)+'</p></div>'+ico('external')+'</a>'}
-function services(){return chrome('services','<div class="screen-head"><div><span class="eyebrow">университет</span><h1>Сервисы</h1><p>Не нужно помнить, где что находится.</p></div></div><section class="service-section"><h2>Личные кабинеты</h2><div class="service-grid">'+serviceCard(SERVICES.lk2)+serviceCard(SERVICES.lk1)+'</div></section><section class="service-section"><h2>Учёба</h2><div class="service-grid">'+serviceCard(SERVICES.classes)+serviceCard(SERVICES.sessions)+serviceCard(SERVICES.fzo)+'</div></section><section class="service-section"><h2>Университет</h2><div class="service-grid">'+serviceCard(SERVICES.site)+'</div></section><div class="privacy-note"><b>Пароли не храним.</b><span>Авторизация ЛК1/ЛК2 остаётся на официальных доменах РГАТУ.</span></div>')}
-function profilePage(){const p=profile();return chrome('profile','<div class="screen-head"><div><span class="eyebrow">персонализация</span><h1>Профиль студента</h1><p>Данные хранятся только на этом устройстве.</p></div></div><form class="profile-form" id="profile-form"><label><span>Имя</span><input name="name" autocomplete="name" placeholder="Как к тебе обращаться" value="'+esc(p.name)+'"></label><div class="form-row"><label><span>Группа</span><input name="group" autocapitalize="characters" placeholder="Например, ЗВС-26" value="'+esc(p.group)+'"></label><label><span>Курс</span><select name="course">'+[1,2,3,4,5,6].map(n=>'<option value="'+n+'"'+(String(n)===p.course?' selected':'')+'>'+n+' курс</option>').join('')+'</select></label></div><label><span>Форма обучения</span><select name="form">'+[['unknown','Выбрать позже'],['full','Очная'],['part','Очно-заочная'],['distance','Заочная']].map(([v,t])=>'<option value="'+v+'"'+(v===p.form?' selected':'')+'>'+t+'</option>').join('')+'</select></label><label><span>Факультет / институт</span><input name="faculty" placeholder="Можно оставить пустым" value="'+esc(p.faculty)+'"></label><button class="save" type="submit">Сохранить профиль '+ico('arrow')+'</button></form><div class="profile-help"><strong>Зачем профиль?</strong><p>Он связывает расписание, сервисы и будущие модули. При официальном входе РГАТУ локальный профиль можно заменить данными университета.</p></div>')}
-function render(){const p=route(),screens={home, schedule, services, profile:profilePage};root.innerHTML=screens[p]()}
-root.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)location.hash=g.dataset.go});
-root.addEventListener('submit',e=>{if(e.target.id!=='profile-form')return;e.preventDefault();const f=new FormData(e.target);write('hub.name',String(f.get('name')||'').trim());write('rgatu.group',String(f.get('group')||'').trim().toUpperCase());write('hub.course',String(f.get('course')||'1'));write('hub.form',String(f.get('form')||'unknown'));write('hub.faculty',String(f.get('faculty')||'').trim());toast('Профиль сохранён');render()});
-window.addEventListener('hashchange',render);render();if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
-})();
+import { getActorRole, getProfile, saveStudentProfile, setActorRole, esc } from './core/state.js';
+import { getRoute, go } from './core/router.js';
+import { icon } from './ui/icons.js';
+import {
+  studentHome,
+  studentProfile,
+  studentSchedule,
+  studentServices,
+  studentStudy,
+} from './pages/student.js';
+import {
+  teacherAssessment,
+  teacherGroups,
+  teacherHome,
+  teacherProfile,
+} from './pages/teacher.js';
+import {
+  adminAcademic,
+  adminGroups,
+  adminHome,
+  adminSchedule,
+  adminStudents,
+} from './pages/admin.js';
+
+const root = document.getElementById('app');
+const toastNode = document.getElementById('toast');
+
+const ROLE_META = {
+  student: {
+    title: 'Студент',
+    eyebrow: 'личный кабинет',
+    nav: [
+      ['home', 'home', 'Главная'],
+      ['schedule', 'calendar', 'Расписание'],
+      ['study', 'book', 'Учёба'],
+      ['services', 'grid', 'Сервисы'],
+      ['profile', 'user', 'Профиль'],
+    ],
+  },
+  teacher: {
+    title: 'Преподаватель',
+    eyebrow: 'рабочее место',
+    nav: [
+      ['home', 'home', 'Главная'],
+      ['groups', 'users', 'Мои группы'],
+      ['assessment', 'check', 'Оценки'],
+      ['profile', 'user', 'Профиль'],
+    ],
+  },
+  admin: {
+    title: 'Администрация',
+    eyebrow: 'управление',
+    nav: [
+      ['home', 'chart', 'Панель'],
+      ['students', 'users', 'Студенты'],
+      ['groups', 'grid', 'Группы'],
+      ['schedule', 'calendar', 'Расписание'],
+      ['academic', 'book', 'Учебный процесс'],
+    ],
+  },
+};
+
+const PAGE_MAP = {
+  student: {
+    home: studentHome,
+    schedule: studentSchedule,
+    study: studentStudy,
+    services: studentServices,
+    profile: studentProfile,
+  },
+  teacher: {
+    home: teacherHome,
+    groups: teacherGroups,
+    assessment: teacherAssessment,
+    profile: teacherProfile,
+  },
+  admin: {
+    home: adminHome,
+    students: adminStudents,
+    groups: adminGroups,
+    schedule: adminSchedule,
+    academic: adminAcademic,
+  },
+};
+
+let toastTimer;
+
+function toast(message) {
+  toastNode.textContent = message;
+  toastNode.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastNode.classList.remove('show'), 2600);
+}
+
+function roleChooser() {
+  return `
+    <main class="role-gate">
+      <section class="role-gate__brand">
+        <img src="./icon.svg" alt="">
+        <span class="eyebrow">неофициальный прототип</span>
+        <h1>РГАТУ</h1>
+        <p>Выберите рабочую среду. После подключения университетской авторизации роль будет определяться автоматически.</p>
+      </section>
+      <section class="role-gate__grid" aria-label="Выбор рабочей среды">
+        <button class="role-card" data-role-select="student">
+          <span class="role-card__icon">${icon('user')}</span>
+          <span><b>Студент</b><small>Расписание, учёба, сессия, ДКР, задолженности и сервисы.</small></span>
+          ${icon('arrow')}
+        </button>
+        <button class="role-card" data-role-select="teacher">
+          <span class="role-card__icon">${icon('book')}</span>
+          <span><b>Преподаватель</b><small>Назначенные занятия, группы, проверки, оценки и ведомости.</small></span>
+          ${icon('arrow')}
+        </button>
+        <button class="role-card" data-role-select="admin">
+          <span class="role-card__icon">${icon('building')}</span>
+          <span><b>Администрация</b><small>Контингент, группы, расписание и управление учебным процессом.</small></span>
+          ${icon('arrow')}
+        </button>
+      </section>
+      <p class="role-gate__note">Переключатель временный и нужен только для разработки интерфейсов до появления SSO/RBAC.</p>
+    </main>`;
+}
+
+function headerContext(role) {
+  if (role === 'student') {
+    const profile = getProfile();
+    return profile.group
+      ? `<b>${esc(profile.group)}</b><span>${esc(profile.course)} курс</span>`
+      : '<span>Профиль не настроен</span>';
+  }
+
+  if (role === 'teacher') {
+    return '<b>Преподаватель</b><span>нагрузка из backend</span>';
+  }
+
+  return '<b>Администрация</b><span>область доступа из RBAC</span>';
+}
+
+function shell(role, page, content) {
+  const meta = ROLE_META[role];
+  const nav = meta.nav.map(([id, glyph, label]) => `
+    <a href="#${role}/${id}" ${page === id ? 'aria-current="page"' : ''}>
+      ${icon(glyph)}
+      <span>${label}</span>
+    </a>`).join('');
+
+  return `
+    <div class="shell shell--${role}">
+      <header class="topbar">
+        <div class="brand">
+          <img src="./icon.svg" alt="">
+          <div><span>${meta.eyebrow}</span><strong>РГАТУ · ${meta.title}</strong></div>
+        </div>
+        <div class="topbar-actions">
+          <div class="student-chip">${headerContext(role)}</div>
+          <button class="role-switch" data-switch-role title="Сменить временную роль разработки">
+            ${icon('settings')}<span>Роль</span>
+          </button>
+        </div>
+      </header>
+      <main class="page">${content}</main>
+      <nav class="nav nav--${role}" aria-label="Главное меню">${nav}</nav>
+    </div>`;
+}
+
+function render() {
+  const actor = getActorRole();
+
+  if (!actor) {
+    document.body.dataset.role = '';
+    root.innerHTML = roleChooser();
+    return;
+  }
+
+  const route = getRoute(actor);
+  const role = route.role || actor;
+  const pageMap = PAGE_MAP[role] || PAGE_MAP.student;
+  const page = pageMap[route.page] ? route.page : 'home';
+
+  if (role !== actor) {
+    setActorRole(role);
+  }
+
+  document.body.dataset.role = role;
+  root.innerHTML = shell(role, page, pageMap[page]());
+}
+
+root.addEventListener('click', (event) => {
+  const roleButton = event.target.closest('[data-role-select]');
+  if (roleButton) {
+    const role = roleButton.dataset.roleSelect;
+    setActorRole(role);
+    go(role, 'home');
+    render();
+    return;
+  }
+
+  const switchButton = event.target.closest('[data-switch-role]');
+  if (switchButton) {
+    setActorRole('');
+    history.replaceState(null, '', location.pathname + location.search);
+    render();
+    return;
+  }
+
+  const goButton = event.target.closest('[data-go]');
+  if (goButton) {
+    const [role, page] = String(goButton.dataset.go).split('/');
+    go(role, page);
+  }
+});
+
+root.addEventListener('submit', (event) => {
+  if (event.target.id !== 'profile-form') return;
+  event.preventDefault();
+  saveStudentProfile(new FormData(event.target));
+  toast('Профиль сохранён');
+  render();
+});
+
+window.addEventListener('hashchange', render);
+render();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}

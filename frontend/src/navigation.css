@@ -1,0 +1,21 @@
+.nav--student,
+.nav--admin {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.nav--teacher {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 420px) {
+  .nav--student a,
+  .nav--admin a {
+    font-size: 9px;
+  }
+
+  .nav--student .icon,
+  .nav--admin .icon {
+    width: 18px;
+    height: 18px;
+  }
+}
