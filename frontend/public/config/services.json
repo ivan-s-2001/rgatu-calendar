@@ -1,0 +1,33 @@
+{
+  "schema": 2,
+  "institution": {
+    "id": "rsatu",
+    "name": "РГАТУ им. П. А. Соловьёва"
+  },
+  "backend": {
+    "mode": "yii3-api",
+    "baseUrlEnv": "VITE_API_BASE_URL",
+    "apiVersion": "v1"
+  },
+  "modules": {
+    "schedule": {
+      "mode": "embedded-static",
+      "path": "./modules/schedule/",
+      "sourceRepository": "ivan-s-2001/rgatu-schedule",
+      "stableCommit": "18df96f4d862fc10c199e93a1a274a17dae23e35",
+      "migrationTarget": "/api/v1/schedule"
+    },
+    "lk1": {
+      "mode": "external-auth",
+      "url": "https://old.rsatu.ru/fzo/kod.php"
+    },
+    "lk2": {
+      "mode": "external-auth",
+      "url": "https://lk.rsatu.ru/user/sign-in/login?_referrer=%2Fsite%2Findex"
+    },
+    "university": {
+      "mode": "external",
+      "url": "https://www.rsatu.ru/"
+    }
+  }
+}

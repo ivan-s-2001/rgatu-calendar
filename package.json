@@ -1,8 +1,9 @@
 {
   "name": "rgatu-student-hub",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "scripts": {
-    "test": "node scripts/test_portal.cjs"
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build"
   }
 }

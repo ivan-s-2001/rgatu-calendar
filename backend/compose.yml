@@ -1,0 +1,16 @@
+services:
+  mariadb:
+    image: mariadb:11.6
+    environment:
+      MARIADB_DATABASE: rgatu_student
+      MARIADB_USER: rgatu
+      MARIADB_PASSWORD: change-me
+      MARIADB_ROOT_PASSWORD: root-change-me
+    ports:
+      - "3306:3306"
+    volumes:
+      - rgatu_mariadb:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+
+volumes:
+  rgatu_mariadb:
